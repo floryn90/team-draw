@@ -1,0 +1,7 @@
+*.xls
+*.xlsx
+*.csv
+*.pdf
+.DS_Store
+output*
+.idea*

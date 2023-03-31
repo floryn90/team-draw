@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TV Show List</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css" />
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <form action="add_favorite" method="post">
+                <input type="hidden" id="index" name="index" value="{{ favorites|length }}">
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input class="form-control" type="text" id="title" name="title">
+                </div>
+                <div class="form-group">
+                    <label for="season">Season:</label>
+                    <input class="form-control" type="text" id="season" name="season">
+                </div>
+                <div class="form-group">
+                    <label for="streamer">Streamer:</label>
+                    <select class="form-control" id="streamer" name="streamer">
+                        <option value="Netflix">Netflix</option>
+                        <option value="Amazon">Amazon</option>
+                        <option value="Disney+">Disney+</option>
+                        <option value="Showtime">Showtime</option>
+                        <option value="Filelist">Filelist</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="releaseDate">Release Date:</label>
+                    <input class="form-control" type="text" id="releaseDate" name="releaseDate">
+                </div>
+                <button class="btn btn-primary" id="add-btn" type="submit">Add</button>
+            </form>
+
+        </div>
+        <div class="col-md-6">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Season</th>
+                    <th>Release date</th>
+                    <th>Streamer</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for favorite in favorites | sort(attribute='releaseDate', reverse=True) %}
+                <tr data-id="{{ loop.index-1 }}">
+                    <td data-field="title">{{ favorite.title }}</td>
+                    <td data-field="season">{{ favorite.season }}</td>
+                    <td data-field="releaseDate">{{ favorite.releaseDate }}</td>
+                    <td data-field="streamer">{{ favorite.streamer }}</td>
+                    <td>
+                        <button class="edit-btn btn btn-sm btn-outline-primary" onclick="toggleButtons({{loop.index0}}); editRow(this)">Edit</button>
+                        <button class="update-btn btn btn-sm btn-outline-success" style="display:none" onclick="toggleButtons({{loop.index0}}); updateRow(this)">Update</button>
+                    </td>
+                </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    flatpickr('#releaseDate', {
+        enableTime: false,
+        dateFormat: "Y-m-d"
+    });
+
+    function toggleButtons(index) {
+        var editBtn = document.querySelectorAll('.edit-btn')[index];
+        var updateBtn = document.querySelectorAll('.update-btn')[index];
+
+        if (updateBtn.style.display === "none") {
+            editBtn.style.display = "none";
+            updateBtn.style.display = "inline-block";
+        }
+    }
+
+    function editRow(button) {
+        // Get the table row element
+        var row = button.parentNode.parentNode;
+
+        // Get the row values
+        var title = row.querySelector('[data-field="title"]').innerText;
+        var season = row.querySelector('[data-field="season"]').innerText;
+        var releaseDate = row.querySelector('[data-field="releaseDate"]').innerText;
+        var streamer = row.querySelector('[data-field="streamer"]').innerText;
+        var index = row.dataset.id;
+
+        // Populate the form with the row values
+        document.getElementById("title").value = title;
+        document.getElementById("season").value = season;
+        document.getElementById("releaseDate").value = releaseDate;
+        document.getElementById("streamer").value = streamer;
+        // Add the index to the hidden field
+        document.getElementById("index").value = index;
+
+        // Hide the edit button and show the update button
+        button.style.display = "none";
+        document.getElementById("add-btn").style.display = "none";
+        row.querySelector(".update-btn").style.display = "inline-block";
+    }
+
+    function updateRow(button) {
+        // Get the table row element
+        var row = button.parentNode.parentNode;
+
+        // Get the form data
+        var formData = new FormData(document.querySelector('form'));
+
+        // Get the hidden index value from the row data-id attribute
+        var index = row.getAttribute("data-id");
+
+        // Add the index value to the form data
+        formData.append("index", index);
+
+        // Send the PUT request to the server
+        fetch(`/favorites/${index}`, {
+            method: 'PUT',
+            body: formData,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Reload the page to show the updated data
+                    location.reload();
+                } else {
+                    throw new Error('Error updating favorite');
+                }
+            })
+            .catch(error => console.error(error));
+    }
+
+
+
+
+</script>
+</body>
+</html>

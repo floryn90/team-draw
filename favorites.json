@@ -1,0 +1,11 @@
+{
+    "favorites": [
+        {
+            "index": "0",
+            "title": "Test1",
+            "season": "1",
+            "releaseDate": "2023-03-31",
+            "streamer": "Netflix"
+        }
+    ]
+}
