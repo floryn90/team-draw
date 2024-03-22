@@ -1,152 +1,417 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>TV Show List</title>
+    <title>Football players</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css" />
+
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css"/>
     <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <style>
+        .fa-star {
+            color: #ccc;
+            cursor: pointer; /* Default cursor */
+        }
+
+        .fa-star:hover {
+            color: goldenrod; /* Change color on hover */
+            cursor: pointer; /* Change cursor on hover */
+        }
+
+        .checked {
+            color: goldenrod;
+        }
+
+    </style>
+
 </head>
 <body>
-<div class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <form action="add_favorite" method="post">
-                <input type="hidden" id="index" name="index" value="{{ favorites|length }}">
-                <div class="form-group">
-                    <label for="title">Title:</label>
-                    <input class="form-control" type="text" id="title" name="title">
-                </div>
-                <div class="form-group">
-                    <label for="season">Season:</label>
-                    <input class="form-control" type="text" id="season" name="season">
-                </div>
-                <div class="form-group">
-                    <label for="streamer">Streamer:</label>
-                    <select class="form-control" id="streamer" name="streamer">
-                        <option value="Netflix">Netflix</option>
-                        <option value="Amazon">Amazon</option>
-                        <option value="Disney+">Disney+</option>
-                        <option value="Showtime">Showtime</option>
-                        <option value="Filelist">Filelist</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="releaseDate">Release Date:</label>
-                    <input class="form-control" type="text" id="releaseDate" name="releaseDate">
-                </div>
-                <button class="btn btn-primary" id="add-btn" type="submit">Add</button>
-            </form>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Football Players Voting</h1>
 
+
+    <!-- Search bar -->
+    <div class="row mb-3">
+        <div class="col">
+            <input type="text" class="form-control" id="search-input" placeholder="Search by name..."
+                   onkeydown="searchplayers();">
         </div>
-        <div class="col-md-6">
-            <table class="table table-striped">
-                <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Season</th>
-                    <th>Release date</th>
-                    <th>Streamer</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for favorite in favorites | sort(attribute='releaseDate', reverse=True) %}
-                <tr data-id="{{ loop.index-1 }}">
-                    <td data-field="title">{{ favorite.title }}</td>
-                    <td data-field="season">{{ favorite.season }}</td>
-                    <td data-field="releaseDate">{{ favorite.releaseDate }}</td>
-                    <td data-field="streamer">{{ favorite.streamer }}</td>
-                    <td>
-                        <button class="edit-btn btn btn-sm btn-outline-primary" onclick="toggleButtons({{loop.index0}}); editRow(this)">Edit</button>
-                        <button class="update-btn btn btn-sm btn-outline-success" style="display:none" onclick="toggleButtons({{loop.index0}}); updateRow(this)">Update</button>
-                    </td>
-                </tr>
-                {% endfor %}
 
-                </tbody>
+        <div class="col">
+            <button class="btn btn-secondary" onclick="clearSearch()">Clear</button>
+        </div>
+    </div>
+
+    <form id="add-player-form" class="mb-3">
+        <div class="row">
+            <div class="col">
+                <input type="text" class="form-control" id="player-name" placeholder="Enter player name"
+                       onkeypress="submitOnEnter(event)">
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-primary" onclick="addPlayer()">Add Player</button>
+            </div>
+        </div>
+    </form>
+
+    <div id="error-message" class="text-danger"></div>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Name ({{ players|length }})</th>
+            <th>Stars</th>
+            <th>Vote count</th>
+            <th>Action</th>
+            <th>Select <span id="selected-count">0</span></th> <!-- New column for checkboxes -->
+        </tr>
+        </thead>
+        <tbody>
+        {% for player in players | sort(attribute='name') %}
+        <tr data-id="{{ player.index }}">
+            <td data-field="name" data-sortable="true">{{ player.name }}</td>
+            <td data-field="stars" stars="{{player.stars}}">
+                {% for i in range(1, 6) %}
+                {% if i <= player.stars %}
+                <span class="fa fa-star checked" data-value="{{ i }}"
+                      onclick="updateStars(this, {{ player.index }}, {{ i }})"></span>
+                {% else %}
+                <span class="fa fa-star" data-value="{{ i }}"
+                      onclick="updateStars(this, {{ player.index }}, {{ i }})"></span>
+                {% endif %}
+                {% endfor %}
+            </td>
+            <td data-field="votes" data-sortable="true">{{ player.votes }}</td>
+            <td>
+                <button class="remove-btn btn btn-sm btn-outline-danger"
+                        onclick="remove({{player.index}});">Remove
+                </button>
+            </td>
+            <td> <!-- New column for checkboxes -->
+                <input type="checkbox" class="player-checkbox" value="{{ player.index }}" onchange="updateCheckboxCount()">
+            </td>
+        </tr>
+        <input type="hidden" id="index" value="{{ player.index }}">
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+    <!-- Draw teams button -->
+    <button class="btn btn-primary" onclick="drawTeams()">Draw teams</button>
+    <!-- Team tables -->
+    <div class="row">
+        <div class="col-md-4">
+            <h2>Orange</h2>
+            <p id="team1-average"></p> <!-- Display average stars here -->
+
+            <table class="table table-striped" id="team1-table">
+                <!-- Team 1 table will be dynamically populated here -->
+            </table>
+        </div>
+        <div class="col-md-4">
+            <h2>Green</h2>
+            <p id="team2-average"></p> <!-- Display average stars here -->
+            <table class="table table-striped" id="team2-table">
+                <!-- Team 2 table will be dynamically populated here -->
+            </table>
+        </div>
+        <div class="col-md-4">
+            <h2>Yellow</h2>
+            <p id="team3-average"></p> <!-- Display average stars here -->
+
+            <table class="table table-striped" id="team3-table">
+                <!-- Team 3 table will be dynamically populated here -->
             </table>
         </div>
     </div>
+
+
 </div>
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
-    flatpickr('#releaseDate', {
-        enableTime: false,
-        dateFormat: "Y-m-d"
+function updateCheckboxCount() {
+    var checkboxes = document.querySelectorAll('.player-checkbox');
+    var selectedCount = 0;
+    checkboxes.forEach(function(checkbox) {
+        if (checkbox.checked) {
+            selectedCount++;
+        }
+    });
+    document.getElementById('selected-count').innerText = selectedCount;
+}
+
+function getSelectedIndexes() {
+    const checkboxes = document.querySelectorAll('.player-checkbox');
+    const indexes = [];
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            indexes.push(checkbox.value);
+        }
+    });
+    return indexes;
+}
+
+function drawTeams() {
+    // AJAX request to fetch teams data
+    fetch('/draw', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ indexes: getSelectedIndexes() })
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Populate Team 1 table and display average stars
+            populateTeamTable(data.team1, 'team1-table', 'team1-average');
+
+            // Populate Team 2 table and display average stars
+            populateTeamTable(data.team2, 'team2-table', 'team2-average');
+
+            // Populate Team 3 table and display average stars
+            populateTeamTable(data.team3, 'team3-table', 'team3-average');
+        })
+        .catch(error => console.error('Error drawing teams:', error));
+}
+
+function populateTeamTable(players, tableId, averageId) {
+    const table = document.getElementById(tableId);
+    table.innerHTML = ''; // Clear existing content
+
+    // Add table header
+    const headerRow = table.insertRow();
+    const nameHeader = headerRow.insertCell();
+    nameHeader.textContent = 'Name';
+    const starsHeader = headerRow.insertCell();
+    starsHeader.textContent = 'Stars';
+
+    let totalStars = 0;
+    let playerCount = players.length;
+
+    // Add table rows for each player
+    players.forEach(player => {
+        totalStars += player.stars;
+        const row = table.insertRow();
+        const nameCell = row.insertCell();
+        nameCell.textContent = player.name;
+        const starsCell = row.insertCell();
+        starsCell.textContent = player.stars;
     });
 
-    function toggleButtons(index) {
-        var editBtn = document.querySelectorAll('.edit-btn')[index];
-        var updateBtn = document.querySelectorAll('.update-btn')[index];
+    if (averageId !== '') {
+        const averageStars = totalStars / playerCount;
+        const averageElement = document.getElementById(averageId);
+        averageElement.textContent = `Average Stars: ${averageStars.toFixed(2)}`;
+    }
+}
 
-        if (updateBtn.style.display === "none") {
-            editBtn.style.display = "none";
-            updateBtn.style.display = "inline-block";
+function updateStars(stars) {
+    // Update the stars div
+    let starsDiv = document.querySelector('.stars');
+    for (let i = 1; i <= 5; i++) {
+        let star = starsDiv.querySelector(`.fa-star:nth-child(${i})`);
+        if (i <= stars) {
+            star.classList.remove('unchecked');
+            star.classList.add('checked');
+        } else {
+            star.classList.remove('checked');
+            star.classList.add('unchecked');
         }
     }
 
-    function editRow(button) {
-        // Get the table row element
-        var row = button.parentNode.parentNode;
+    // Update the hidden input value
+    let starsInput = document.querySelector('#stars');
+    starsInput.value = stars;
+}
 
-        // Get the row values
-        var title = row.querySelector('[data-field="title"]').innerText;
-        var season = row.querySelector('[data-field="season"]').innerText;
-        var releaseDate = row.querySelector('[data-field="releaseDate"]').innerText;
-        var streamer = row.querySelector('[data-field="streamer"]').innerText;
-        var index = row.dataset.id;
+function addPlayer() {
+    var playerName = document.getElementById("player-name").value;
 
-        // Populate the form with the row values
-        document.getElementById("title").value = title;
-        document.getElementById("season").value = season;
-        document.getElementById("releaseDate").value = releaseDate;
-        document.getElementById("streamer").value = streamer;
-        // Add the index to the hidden field
-        document.getElementById("index").value = index;
-
-        // Hide the edit button and show the update button
-        button.style.display = "none";
-        document.getElementById("add-btn").style.display = "none";
-        row.querySelector(".update-btn").style.display = "inline-block";
+    if (playerName.trim() === "") {
+        alert("Please enter a player name.");
+        return;
     }
 
-    function updateRow(button) {
-        // Get the table row element
-        var row = button.parentNode.parentNode;
+    fetch('/add_player', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: playerName
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Parse the JSON response only if the response status is not ok
+            return response.json()
+            .then(data => {
+                throw new Error(data.error || 'Failed to add player');  // Throw an error with the error message from the response, or a default message
+            });
+        } else {
+            // If the response status is ok, return null to skip the subsequent .then() block
+            return null;
+        }
+    })
+    .then(() => {
+        // If successful, clear the error message
+        document.getElementById('error-message').innerText = '';
+        // Refresh the page to show the updated list of players
+        location.reload();
+    })
+    .catch(error => {
+        // Display the error message
+        document.getElementById('error-message').innerText = error.message;
+    });
+}
 
-        // Get the form data
-        var formData = new FormData(document.querySelector('form'));
+function submitOnEnter(event) {
+    if (event.keyCode === 13) {
+        addPlayer();
+    }
+}
 
-        // Get the hidden index value from the row data-id attribute
-        var index = row.getAttribute("data-id");
+function searchplayers() {
+    // Get the search input value
+    var searchValue = document.getElementById("search-input").value.toLowerCase();
 
-        // Add the index value to the form data
-        formData.append("index", index);
+    // Get all the rows in the table body
+    var rows = document.querySelectorAll("tbody tr");
 
-        // Send the PUT request to the server
-        fetch(`/favorites/${index}`, {
+    // Loop through the rows and hide/show them based on the search value
+    for (var i = 0; i < rows.length; i++) {
+        var nameCell = rows[i].querySelector("[data-field='name']");
+        var name = nameCell.textContent.toLowerCase();
+
+        if (name.includes(searchValue)) {
+            rows[i].style.display = "";
+        } else {
+            rows[i].style.display = "none";
+        }
+    }
+}
+
+function selectStars(star, value) {
+    var stars = star.parentNode.querySelectorAll('.fa-star');
+    for (var i = 0; i < stars.length; i++) {
+        if (i < value) {
+            stars[i].classList.add('checked');
+            stars[i].classList.remove('unchecked');
+        } else {
+            stars[i].classList.remove('checked');
+            stars[i].classList.add('unchecked');
+        }
+    }
+    document.getElementById('stars').value = value;
+}
+
+
+function clearSearch() {
+    // Clear the search input value
+    document.getElementById('search-input').value = '';
+
+    // Run the search function to show all players again
+    searchplayers();
+}
+
+function updateStars(star, index, stars) {
+    fetch(`/players/${index}`, {
             method: 'PUT',
-            body: formData,
+            body: JSON.stringify({
+                name: star.parentNode.previousElementSibling.textContent, // Get player name
+                stars: stars,
+            }),
             headers: {
                 'Content-Type': 'application/json'
-            },
+            }
         })
-            .then(response => {
-                if (response.ok) {
-                    // Reload the page to show the updated data
-                    location.reload();
-                } else {
-                    throw new Error('Error updating favorite');
-                }
-            })
-            .catch(error => console.error(error));
+        .then(response => {
+            if (response.ok) {
+                // Reload the page to show the updated data
+                location.reload();
+            } else {
+                throw new Error('Error updating player');
+            }
+        })
+        .catch(error => console.error(error));
+}
+
+
+function remove(index) {
+    // Get the row element for the selected player
+    var row = document.querySelector(`tr[data-id='${index}']`);
+
+    // Check that the row exists before trying to access its properties
+    if (row) {
+        var name = row.querySelector("[data-field='name']").textContent;
+        var message = `Are you sure you want to remove '${name}'?`;
+
+        if (confirm(message)) {
+            // Send the DELETE request to the server
+            fetch(`/players/${index}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Reload the page to show the updated data
+                        location.reload();
+                    } else {
+                        throw new Error('Error removing player');
+                    }
+                })
+                .catch(error => console.error(error));
+        }
+    }
+}
+
+$(document).ready(function() {
+    const players = {{ players | tojson }};
+    const indexInput = document.getElementById("index");
+    const maxIndex = Math.max(...players.map(player => player.index));
+    indexInput.value = maxIndex + 1;
+
+    $('table').each(function() {
+        $(this).find('th').slice(0, -1).wrapInner('<a href="#"></a>').addClass('sorting').on('click', function(e) {
+            e.preventDefault();
+            var table = $(this).parents('table').eq(0);
+            var columnIndex = $(this).index();
+            var sortingFunction = compare(columnIndex);
+            var rows = table.find('tr:gt(0)').toArray().sort(sortingFunction);
+            this.asc = !this.asc;
+            if (!this.asc) {
+                rows = rows.reverse();
+            }
+            for (var i = 0; i < rows.length; i++) {
+                table.append(rows[i]);
+            }
+            table.find('th').removeClass('sorting').removeClass('asc').removeClass('desc');
+            $(this).addClass(this.asc ? 'asc' : 'desc');
+        });
+    });
+
+    function compare(idx) {
+        if (idx === 1) { // Check if sorting by "stars" column
+            return function(a, b) {
+                var valA = parseInt($(a).find('[data-field="stars"]').attr('stars')),
+                    valB = parseInt($(b).find('[data-field="stars"]').attr('stars'));
+                return valA - valB;
+            }
+        } else {
+            return function(a, b) {
+                var valA = getCellValue(a, idx),
+                    valB = getCellValue(b, idx);
+                return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.localeCompare(valB);
+            }
+        }
     }
 
-
-
+    function getCellValue(row, index) {
+        return $(row).children('td').eq(index).text();
+    }
+});
 
 </script>
 </body>
