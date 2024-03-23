@@ -9,4 +9,4 @@ def load_data():
 # Save data to JSON file
 def save_data(data):
     with open('players.json', 'w') as f:
-        json.dump(data, f, indent=4)
+        json.dump(data, f, indent=4, ensure_ascii=False)
