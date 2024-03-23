@@ -52,6 +52,7 @@
             </div>
             <div class="col">
                 <button type="button" class="btn btn-primary" onclick="addPlayer()">Add Player</button>
+                <button type="button" class="btn btn-danger" onclick="resetVoting()">Reset voting</button>
             </div>
         </div>
     </form>
@@ -100,7 +101,7 @@
 
 
     <button class="btn btn-primary" onclick="drawTeams()">Draw teams</button>
-    <p class="text-muted">Note: Select a minimum of 15 players to make a draw.</p>
+    <p class="text-muted">Note: Select players to make a draw.</p>
     <!-- Team tables -->
     <div class="row">
         <div class="col-md-4">
@@ -132,6 +133,25 @@
 </div>
 
 <script>
+function resetVoting() {
+    var message = "Are you sure you want to reset voting scores?";
+    if (confirm(message)) {
+        // Call the endpoint to reset voting
+        fetch("/reset-voting", {
+            method: "POST"
+        })
+        .then(response => {
+            if (response.ok) {
+                // Reset was successful, perform any necessary actions
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error("Error resetting voting:", error);
+        });
+    }
+}
+
 function updateCheckboxCount() {
     var checkboxes = document.querySelectorAll('.player-checkbox');
     var selectedCount = 0;

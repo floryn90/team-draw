@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, redirect, jsonify
 from list import save_data, load_data
 import math
 import random
+import os
+from shutil import copyfile
+from datetime import datetime
 
 application = Flask(__name__, static_url_path='/static')
 
@@ -83,6 +86,26 @@ def remove_player(index):
 
     return jsonify({'success': True, 'message': f'Removed player: {player["name"]}'})
 
+@application.route('/reset-voting', methods=['POST'])
+def reset_voting():
+    players_data = load_data()
+    players = players_data['players']
+
+    # Create a backup of the existing players data file
+    backup_filename = f"players_{datetime.now().strftime('%d_%m_%Y_%H_%M')}.json"
+    backup_path = os.path.join(os.getcwd(), backup_filename)
+    copyfile('players.json', backup_path)
+
+    # Reset voting and stars for each player
+    for player in players:
+        player['votes'] = 0
+        player['stars'] = 1
+        player['starVotes'] = []
+
+    # Save the updated data
+    save_data(players_data)
+
+    return jsonify({'message': 'Voting and stars reset successfully.', 'backup': backup_filename})
 @application.route('/draw', methods=['POST'])
 def draw_teams():
     players_data = load_data()  # Load players data
