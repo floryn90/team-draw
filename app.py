@@ -88,7 +88,7 @@ def draw_teams():
     players_data = load_data()  # Load players data
     players = players_data['players']
     indexes = request.json['indexes']
-    print(indexes)
+
     # Group players by star rating
     star_ratings = {'high': [], 'medium': [], 'low': []}
     for player in players:
@@ -102,8 +102,6 @@ def draw_teams():
             star_ratings['medium'].append(player)
         else:
             star_ratings['low'].append(player)
-
-    print(star_ratings)
 
     # Initialize teams and the total number of players drawn
     team1 = []
@@ -125,7 +123,7 @@ def draw_teams():
                 return player_selected
 
     # Distribute players among teams, alternating between top and bottom players
-    while total_players_drawn < 18:
+    while total_players_drawn < len(indexes):
         team1.append(select_player())
         team2.append(select_player())
         team3.append(select_player())
