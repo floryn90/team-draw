@@ -89,3 +89,15 @@ sudo systemctl enable myproject
 5. full logs
 sudo journalctl -u flaskencryptor.service
 ```
+
+```commandline
+cp football-draw.service /etc/systemd/system/football-draw.service
+sudo systemctl enable football-draw
+virtualenv myprojectenv
+source myprojectenv/bin/activate
+pip install gunicorn flask
+gunicorn --bind 0.0.0.0:9091 wsgi
+deactivate
+sudo chmod 0755 run.sh
+./run.sh
+```

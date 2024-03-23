@@ -1,7 +1,3 @@
-if [ "$1" = "monitor-restart" ]; then
-  nohup python3 check_release_date.py 2>&1 &
-fi
-
-cp favorites.json favorites_backup.json
-sudo systemctl restart myproject
-sudo systemctl status myproject
+cp players.json players_$(date +%F).json
+sudo systemctl restart  football-draw
+sudo systemctl status football-draw
