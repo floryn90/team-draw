@@ -10,18 +10,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
     <style>
-        .fa-star {
+        .fa-futbol {
             color: #ccc;
             cursor: pointer; /* Default cursor */
         }
 
-        .fa-star:hover {
-            color: goldenrod; /* Change color on hover */
+        .fa-futbol:hover {
+            color: black; /* Change color on hover */
             cursor: pointer; /* Change cursor on hover */
         }
 
         .checked {
-            color: goldenrod;
+            color: black;
         }
 
     </style>
@@ -63,7 +63,7 @@
         <thead>
         <tr>
             <th>Name ({{ players|length }})</th>
-            <th>Stars</th>
+            <th>Rank</th>
             <th>Vote count</th>
             <th>Action</th>
             <th>Select <span id="selected-count">0</span></th> <!-- New column for checkboxes -->
@@ -76,10 +76,10 @@
             <td data-field="stars" stars="{{player.stars}}">
                 {% for i in range(1, 6) %}
                 {% if i <= player.stars %}
-                <span class="fa fa-star checked" data-value="{{ i }}"
+                <span class="fa fa-futbol checked" data-value="{{ i }}"
                       onclick="updateStars(this, {{ player.index }}, {{ i }})"></span>
                 {% else %}
-                <span class="fa fa-star" data-value="{{ i }}"
+                <span class="fa fa-futbol" data-value="{{ i }}"
                       onclick="updateStars(this, {{ player.index }}, {{ i }})"></span>
                 {% endif %}
                 {% endfor %}
@@ -206,7 +206,7 @@ function populateTeamTable(players, tableId, averageId) {
     const nameHeader = headerRow.insertCell();
     nameHeader.textContent = 'Name';
     const starsHeader = headerRow.insertCell();
-    starsHeader.textContent = 'Stars';
+    starsHeader.textContent = 'Rank';
 
     let totalStars = 0;
     let playerCount = players.length;
@@ -224,7 +224,7 @@ function populateTeamTable(players, tableId, averageId) {
     if (averageId !== '') {
         const averageStars = totalStars / playerCount;
         const averageElement = document.getElementById(averageId);
-        averageElement.textContent = `Average Stars: ${averageStars.toFixed(2)}`;
+        averageElement.textContent = `Average rank: ${averageStars.toFixed(2)}`;
     }
 }
 
@@ -232,7 +232,7 @@ function updateStars(stars) {
     // Update the stars div
     let starsDiv = document.querySelector('.stars');
     for (let i = 1; i <= 5; i++) {
-        let star = starsDiv.querySelector(`.fa-star:nth-child(${i})`);
+        let star = starsDiv.querySelector(`.fa-futbol:nth-child(${i})`);
         if (i <= stars) {
             star.classList.remove('unchecked');
             star.classList.add('checked');
@@ -315,7 +315,7 @@ function searchplayers() {
 }
 
 function selectStars(star, value) {
-    var stars = star.parentNode.querySelectorAll('.fa-star');
+    var stars = star.parentNode.querySelectorAll('.fa-futbol');
     for (var i = 0; i < stars.length; i++) {
         if (i < value) {
             stars[i].classList.add('checked');
