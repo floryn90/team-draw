@@ -62,9 +62,9 @@
     <table class="table table-striped">
         <thead>
         <tr>
-            <th>Name ({{ players|length }})</th>
-            <th>Rank</th>
-            <th>Vote count</th>
+            <th>Name ({{ players|length }}) <i class="fas fa-sort"></i></th>
+            <th>Rank <i class="fas fa-sort"></i></th>
+            <th>Vote count <i class="fas fa-sort"></i></th>
             <th>Action</th>
             <th>Select <span id="selected-count">0</span></th> <!-- New column for checkboxes -->
         </tr>
@@ -105,7 +105,7 @@
     <!-- Team tables -->
     <div class="row">
         <div class="col-md-4">
-            <h2>Orange</h2>
+            <h2><i class="fas fa-tshirt" style="color: rgba(16,207,188,255); font-size: 1em; text-align:center; width: 100%"></i></h2>
             <p id="team1-average"></p> <!-- Display average stars here -->
 
             <table class="table table-striped" id="team1-table">
@@ -113,14 +113,14 @@
             </table>
         </div>
         <div class="col-md-4">
-            <h2>Green</h2>
+            <h2><i class="fas fa-tshirt" style="color: rgba(191,232,94,255); font-size: 1em; text-align:center; width: 100%"></i></h2>
             <p id="team2-average"></p> <!-- Display average stars here -->
             <table class="table table-striped" id="team2-table">
                 <!-- Team 2 table will be dynamically populated here -->
             </table>
         </div>
         <div class="col-md-4">
-            <h2>Yellow</h2>
+            <h2><i class="fas fa-tshirt" style="color: rgba(248,89,67,255); font-size: 1em; text-align:center; width: 100%"></i></h2>
             <p id="team3-average"></p> <!-- Display average stars here -->
 
             <table class="table table-striped" id="team3-table">
