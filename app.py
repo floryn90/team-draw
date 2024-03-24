@@ -152,8 +152,58 @@ def draw_teams():
         team3.append(select_player())
         total_players_drawn += 3
 
+    balance_teams(team1, team2, team3)
+
     # Return the selected teams
     return jsonify({'team1': team1, 'team2': team2, 'team3': team3})
+
+
+def balance_teams(team1, team2, team3):
+    # Calculate average stars for each team
+    avg_team1 = sum(player['stars'] for player in team1) / len(team1)
+    avg_team2 = sum(player['stars'] for player in team2) / len(team2)
+    avg_team3 = sum(player['stars'] for player in team3) / len(team3)
+
+    # Find the team with the highest and lowest average stars
+    highest_avg_team = max(avg_team1, avg_team2, avg_team3)
+    lowest_avg_team = min(avg_team1, avg_team2, avg_team3)
+
+    # Check if the difference in average stars is >= 0.5
+    if highest_avg_team - lowest_avg_team >= 0.5:
+        # Determine which team has the highest difference and the corresponding lowest team
+        if highest_avg_team == avg_team1:
+            lowest_team = team3
+            highest_team = team1
+        elif highest_avg_team == avg_team2:
+            lowest_team = team1
+            highest_team = team2
+        else:
+            lowest_team = team1
+            highest_team = team3
+
+        # Get the players with the lowest and highest stars in the lowest average team
+        lowest_player = min(lowest_team, key=lambda x: x['stars'])
+        target_stars = lowest_player['stars'] + 2
+        potential_players = [player for player in highest_team if player['stars'] == target_stars]
+
+        # If there are potential players in the highest team, select one randomly
+        if potential_players:
+            chosen_player = random.choice(potential_players)
+
+        # Swap the lowest player with the highest player
+        highest_team.remove(chosen_player)
+        lowest_team.remove(lowest_player)
+        highest_team.append(lowest_player)
+        lowest_team.append(chosen_player)
+
+        print(f'highest player {chosen_player   } switched with {lowest_player}')
+        print("Teams have been balanced successfully.")
+    else:
+        print("The difference in average stars between the top and bottom teams is not >= 0.5.")
+
+# Example usage:
+# balance_teams(team1, team2, team3)
+
 
 
 
