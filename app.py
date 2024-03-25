@@ -60,7 +60,11 @@ def update_favorite(index):
             total_votes = player['votes']
             if total_votes > 0:
                 average_stars = total_stars / total_votes
-                player['stars'] = math.ceil(average_stars)
+                decimal_part = average_stars - math.floor(average_stars)
+                if decimal_part >= 0.5:
+                    player['stars'] = math.ceil(average_stars)
+                else:
+                    player['stars'] = math.floor(average_stars)
 
             save_data(players)
 
