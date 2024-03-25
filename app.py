@@ -169,7 +169,7 @@ def balance_teams(team1, team2, team3):
     lowest_avg_team = min(avg_team1, avg_team2, avg_team3)
 
     # Check if the difference in average stars is >= 0.5
-    if highest_avg_team - lowest_avg_team >= 0.5:
+    if highest_avg_team - lowest_avg_team >= 0.4:
         # Determine which team has the highest difference and the corresponding lowest team
         if highest_avg_team == avg_team1:
             lowest_team = team3
