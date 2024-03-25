@@ -413,7 +413,7 @@ $(document).ready(function() {
     });
 
     function compare(idx) {
-        if (idx === 1) { // Check if sorting by "stars" column
+        if (idx === 2) { // Check if sorting by "stars" column
             return function(a, b) {
                 var valA = parseInt($(a).find('[data-field="stars"]').attr('stars')),
                     valB = parseInt($(b).find('[data-field="stars"]').attr('stars'));
