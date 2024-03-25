@@ -56,15 +56,7 @@ def update_favorite(index):
             player['votes'] += 1  # Increment vote count
 
             # Calculate average stars
-            total_stars = sum(player['starVotes'])
-            total_votes = player['votes']
-            if total_votes > 0:
-                average_stars = total_stars / total_votes
-                decimal_part = average_stars - math.floor(average_stars)
-                if decimal_part >= 0.5:
-                    player['stars'] = math.ceil(average_stars)
-                else:
-                    player['stars'] = math.floor(average_stars)
+            calculate_average_stars(player)
 
             save_data(players)
 
@@ -205,13 +197,28 @@ def balance_teams(team1, team2, team3):
     else:
         print("The difference in average stars between the top and bottom teams is not >= 0.5.")
 
-# Example usage:
-# balance_teams(team1, team2, team3)
+def calculate_average_stars(player):
+    total_stars = sum(player['starVotes'])
+    total_votes = player['votes']
+    if total_votes > 0:
+        average_stars = total_stars / total_votes
+        decimal_part = average_stars - math.floor(average_stars)
+        if decimal_part >= 0.5:
+            player['stars'] = math.ceil(average_stars)
+        else:
+            player['stars'] = math.floor(average_stars)
 
-
-
+# Calculate average stars for all players when the application starts
+def calculate_average_stars_for_all_players():
+    players = load_data()
+    for player in players['players']:
+        calculate_average_stars(player)
+    save_data(players)
 
 if __name__ == "__main__":
+    # Calculate average stars for all players when the application starts
+    calculate_average_stars_for_all_players()
+
     application.run(host='0.0.0.0', debug=True)
 
 
