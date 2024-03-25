@@ -62,16 +62,19 @@
     <table class="table table-striped">
         <thead>
         <tr>
+            <th>Select <span id="selected-count">0</span></th> <!-- New column for checkboxes -->
             <th>Name ({{ players|length }}) <i class="fas fa-sort"></i></th>
             <th>Rank <i class="fas fa-sort"></i></th>
             <th>Vote count <i class="fas fa-sort"></i></th>
             <th>Action</th>
-            <th>Select <span id="selected-count">0</span></th> <!-- New column for checkboxes -->
         </tr>
         </thead>
         <tbody>
         {% for player in players | sort(attribute='name') %}
         <tr data-id="{{ player.index }}">
+            <td> <!-- New column for checkboxes -->
+                <input type="checkbox" class="player-checkbox" value="{{ player.index }}" onchange="updateCheckboxCount()">
+            </td>
             <td data-field="name" data-sortable="true">{{ player.name }}</td>
             <td data-field="stars" stars="{{player.stars}}">
                 {% for i in range(1, 6) %}
@@ -89,9 +92,6 @@
                 <button class="remove-btn btn btn-sm btn-outline-danger"
                         onclick="remove({{player.index}});">Remove
                 </button>
-            </td>
-            <td> <!-- New column for checkboxes -->
-                <input type="checkbox" class="player-checkbox" value="{{ player.index }}" onchange="updateCheckboxCount()">
             </td>
         </tr>
         <input type="hidden" id="index" value="{{ player.index }}">
