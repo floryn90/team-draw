@@ -82,7 +82,7 @@ def remove_player(index):
 
     return jsonify({'success': True, 'message': f'Removed player: {player["name"]}'})
 
-@application.route('/reset-voting', methods=['POST'])
+@application.route('/9a8097d4-d0e1-4ee4-8d12-aa75d138f6db', methods=['POST'])
 def reset_voting():
     players_data = load_data()
     players = players_data['players']
