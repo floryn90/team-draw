@@ -231,10 +231,13 @@ def calculate_average_stars(player):
 
 # Calculate average stars for all players when the application starts
 def calculate_average_stars_for_all_players():
-    players = load_data()
+    source_url = request.headers.get('referer')
+    file_name = get_filename_from_url(source_url)
+    players = load_data(file_name)
     for player in players['players']:
         calculate_average_stars(player)
-    save_data(players)
+    save_data(players, file_name)
+
 def get_filename_from_url(url):
     parsed_url = urlparse(url)
     path = parsed_url.path
