@@ -5,6 +5,7 @@ import random
 import os
 from shutil import copyfile
 from datetime import datetime
+from urllib.parse import urlparse
 
 application = Flask(__name__, static_url_path='/static')
 
@@ -13,11 +14,18 @@ application = Flask(__name__, static_url_path='/static')
 def home():
     data = load_data()
     return render_template('index.html', players=data['players'])
+# Home page
+@application.route('/fotbal-miercuri-magic')
+def magic():
+    data = load_data('players_magic.json')
+    return render_template('index.html', players=data['players'])
 
 # Add favorite TV show
 @application.route('/add_player', methods=['POST'])
 def add_player():
-    data = load_data()
+    source_url = request.headers.get('referer')
+    file_name = get_filename_from_url(source_url)
+    data = load_data(file_name)
     players = data['players']
 
     name = request.json.get('name')  # Get player name from request
@@ -40,14 +48,16 @@ def add_player():
     players.append(new_player)
 
     # Save the updated data
-    save_data(data)
+    save_data(data, file_name)
 
-    return redirect('/fotbal-luni-db')
+    return redirect(source_url)
 
 
 @application.route('/players/<int:index>', methods=['PUT'])
 def update_favorite(index):
-    players = load_data()
+    source_url = request.headers.get('referer')
+    file_name = get_filename_from_url(source_url)
+    players = load_data(file_name)
 
     for player in players['players']:
         if int(player['index']) == index:
@@ -58,7 +68,7 @@ def update_favorite(index):
             # Calculate average stars
             calculate_average_stars(player)
 
-            save_data(players)
+            save_data(players, file_name)
 
             return jsonify(player)
 
@@ -67,7 +77,9 @@ def update_favorite(index):
 
 @application.route('/players/<int:index>', methods=['DELETE'])
 def remove_player(index):
-    players = load_data()
+    source_url = request.headers.get('referer')
+    file_name = get_filename_from_url(source_url)
+    players = load_data(file_name)
 
     player = None
     for f in players['players']:
@@ -78,13 +90,15 @@ def remove_player(index):
     if not player:
         return jsonify({'error': 'Payer not found.'}), 404
     players['players'].remove(player)
-    save_data(players)
+    save_data(players, file_name)
 
     return jsonify({'success': True, 'message': f'Removed player: {player["name"]}'})
 
 @application.route('/9a8097d4-d0e1-4ee4-8d12-aa75d138f6db', methods=['POST'])
 def reset_voting():
-    players_data = load_data()
+    source_url = request.headers.get('referer')
+    file_name = get_filename_from_url(source_url)
+    players_data = load_data(file_name)
     players = players_data['players']
 
     # Create a backup of the existing players data file
@@ -99,12 +113,14 @@ def reset_voting():
         player['starVotes'] = []
 
     # Save the updated data
-    save_data(players_data)
+    save_data(players_data, file_name)
 
     return jsonify({'message': 'Voting and stars reset successfully.', 'backup': backup_filename})
 @application.route('/draw', methods=['POST'])
 def draw_teams():
-    players_data = load_data()  # Load players data
+    source_url = request.headers.get('referer')
+    file_name = get_filename_from_url(source_url)
+    players_data = load_data(file_name)
     players = players_data['players']
     indexes = request.json['indexes']
 
@@ -189,14 +205,14 @@ def balance_teams(team1, team2, team3):
             if potential_players:
                 chosen_player = random.choice(potential_players)
 
-            # Swap the lowest player with the highest player
-            highest_team.remove(chosen_player)
-            lowest_team.remove(lowest_player)
-            highest_team.append(lowest_player)
-            lowest_team.append(chosen_player)
+                # Swap the lowest player with the highest player
+                highest_team.remove(chosen_player)
+                lowest_team.remove(lowest_player)
+                highest_team.append(lowest_player)
+                lowest_team.append(chosen_player)
 
-            print(f'highest player {chosen_player} switched with {lowest_player}')
-            print("Teams have been balanced successfully.")
+                print(f'highest player {chosen_player} switched with {lowest_player}')
+                print("Teams have been balanced successfully.")
         else:
             is_balanced = True
             print("The difference in average stars between the top and bottom teams is not > 0.1.")
@@ -219,6 +235,17 @@ def calculate_average_stars_for_all_players():
     for player in players['players']:
         calculate_average_stars(player)
     save_data(players)
+def get_filename_from_url(url):
+    parsed_url = urlparse(url)
+    path = parsed_url.path
+
+    if 'fotbal-luni-db' in path:
+        return 'players.json'
+    elif 'fotbal-miercuri-magic' in path:
+        return 'players_magic.json'
+    else:
+        # Default case
+        return 'players.json'
 
 if __name__ == "__main__":
     # Calculate average stars for all players when the application starts

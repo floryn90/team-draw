@@ -1,12 +1,12 @@
 import json
 
 # Load data from JSON file
-def load_data():
-    with open('players.json', 'r') as f:
+def load_data(filename='players.json'):
+    with open(filename, 'r') as f:
         data = json.load(f)
     return data
 
 # Save data to JSON file
-def save_data(data):
-    with open('players.json', 'w') as f:
+def save_data(data, filename='players.json'):
+    with open(filename, 'w') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
