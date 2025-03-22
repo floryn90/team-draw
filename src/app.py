@@ -17,7 +17,7 @@ def home():
 # Home page
 @application.route('/fotbal-miercuri-magic')
 def magic():
-    data = load_data('players_magic.json')
+    data = load_data('players/players_magic.json')
     return render_template('index.html', players=data['players'])
 
 # Add favorite TV show
@@ -243,12 +243,12 @@ def get_filename_from_url(url):
     path = parsed_url.path
 
     if 'fotbal-luni-db' in path:
-        return 'players.json'
+        return 'players/players.json'
     elif 'fotbal-miercuri-magic' in path:
-        return 'players_magic.json'
+        return 'players/players_magic.json'
     else:
         # Default case
-        return 'players.json'
+        return 'players/players.json'
 
 if __name__ == "__main__":
     # Calculate average stars for all players when the application starts
