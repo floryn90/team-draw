@@ -7,4 +7,4 @@ FROM python
 COPY --from=base /usr/src/app /usr/src/app
 WORKDIR /usr/src/app
 
-CMD [ "python", ".app.py" ]
+CMD [ "python", "app.py" ]
