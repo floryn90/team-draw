@@ -43,5 +43,5 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event.pull_request.merged && true || false }}
-          tags: floryn90/team-draw:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/team-draw:latest
           context: ${{ github.workspace }}          
