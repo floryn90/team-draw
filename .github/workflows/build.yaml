@@ -3,6 +3,8 @@ run-name: Building the application
 
 on: 
   push:
+    branches-ignore:
+      - master
   pull_request:
     branches:
       - master
@@ -34,6 +36,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          push: ${{ github.event.pull_request.merged == 'true' && true || false }}
+          push: ${{ github.event.pull_request.merged && true || false }}
           tags: floryn90/team-draw:latest
           context: ${{ github.workspace }}
