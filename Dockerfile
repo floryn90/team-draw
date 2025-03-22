@@ -8,4 +8,4 @@ FROM python
 COPY --from=base /usr /usr
 WORKDIR /usr/src/app
 ENV FLASK_APP=app.py
-CMD [ "/usr/src/app/fotbal/bin/gunicorn", "--workers=4", "--bind=0.0.0.0:8080", "-m 007", "wsgi" ]
+CMD [ "gunicorn", "--workers=4", "--bind=0.0.0.0:8080", "-m 007", "wsgi" ]
