@@ -38,9 +38,22 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Build and export to Docker
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          load: true
+          tags: floryn90/team-draw:latest
+          context: ${{ github.workspace }}
+
+      - name: Test image
+        run: docker run --rm floryn90/team-draw:latest
+
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
+          platforms: linux/amd64,linux/arm64
           push: ${{ github.event.pull_request.merged && true || false }}
           tags: floryn90/team-draw:latest
-          context: ${{ github.workspace }}
+          context: ${{ github.workspace }}          
