@@ -254,6 +254,6 @@ if __name__ == "__main__":
     # Calculate average stars for all players when the application starts
     calculate_average_stars_for_all_players()
 
-    application.run(host='0.0.0.0', port='80', debug=True)
+    application.run(host='0.0.0.0', debug=True)
 
 
