@@ -9,6 +9,12 @@ from urllib.parse import urlparse
 
 application = Flask(__name__, static_url_path='/static')
 
+# Default Home page
+@application.route('/')
+def default_home():
+    data = load_data()
+    return render_template('index.html', players=data['players'])
+
 # Home page
 @application.route('/fotbal-luni-db')
 def home():
