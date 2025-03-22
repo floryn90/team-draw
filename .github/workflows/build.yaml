@@ -39,6 +39,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          push: true
+          push: ${{ github.event.pull_request.merged == true && true || false}}
           tags: floryn90/team-draw:latest
           context: ${{ github.workspace }}
