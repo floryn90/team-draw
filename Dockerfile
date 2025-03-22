@@ -1,6 +1,6 @@
 FROM python as base
 WORKDIR /usr/src/app
-COPY src/requirements.txt ./
+COPY src/ ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 FROM python
