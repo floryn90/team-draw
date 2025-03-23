@@ -5,7 +5,13 @@ on:
   push:
     branches-ignore:
       - master
+    paths-ignore:
+      - .github/**
+      - README.md
   pull_request:
+    paths-ignore:
+      - .github/**
+      - README.md
     branches:
       - master
     types:
@@ -42,6 +48,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64,linux/arm64
-          push: ${{ github.event.pull_request.merged && true || false }}
+          push: ${{ github.event.pull_request.merged || github.event_name == 'workflow_dispatch' && true || false }}
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/team-draw:latest
           context: ${{ github.workspace }}          
